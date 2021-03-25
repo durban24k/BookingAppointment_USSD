@@ -33,8 +33,8 @@ app.post('*',(req,res)=>{
      let txt=text.split('*');
 
      if(text==''){
-          response=`CON Welcome to YIELD OPTICAL
-          1. Continue
+          response=`CON Welcome to OPTICAL CARE
+          1. Book an Appointment
           2. Exit`;
      }else if(txt[0]==='1' && count===1){
           response=`CON Enter your First Name`;
