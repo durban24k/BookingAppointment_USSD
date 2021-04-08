@@ -13,7 +13,7 @@ const db=mysql.createConnection({
 
 db.connect((err)=>{
      if(!err){
-          console.log(`Database Connected Successfully!!\nConnected as ${dbConnection.threadId}`);
+          console.log(`Database Connected Successfully!!\nConnected as ${db.threadId}`);
      }else{
           console.error(`Database Connection Failed!!!\nError connecting: ${err.stack}`);
           return;
