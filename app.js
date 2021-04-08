@@ -118,15 +118,15 @@ app.post('*',(req,res)=>{
      }else if(count===7 && txt[6]=='1'){
           fname=txt[1];
           lname=txt[2];
-          if(txt[3]=='1'){
+          if(txt[3]==='1'){
                app_date=addDays(0);
-          }else if(txt[3]=='2'){
+          }else if(txt[3]==='2'){
                app_date=addDays(1);
-          }else if(txt[3]=='3'){
+          }else if(txt[3]==='3'){
                app_date=addDays(2);
-          }else if(txt[3]=='4'){
+          }else if(txt[3]==='4'){
                app_date=addDays(3);
-          }else if(txt[3]=='5'){
+          }else if(txt[3]==='5'){
                app_date=addDays(4);
           }
 
@@ -169,11 +169,11 @@ app.post('*',(req,res)=>{
                          <h3>New Appointment</h3>
                          <p>A new appointment has been booked<br>
                          ---DETAILS---<br>
-                         Name: ${fname} ${lname}<br>
-                         Phone No: ${phone_no}<br>
-                         Date: ${app_date}<br>
-                         Time: ${app_time}<br>
-                         Type: ${app_type}<br>
+                         Name: <b>${fname} ${lname}</b><br>
+                         Phone No: <b>${phone_no}</b><br>
+                         Date: <b>${app_date}</b><br>
+                         Time: <b>${app_time}</b><br>
+                         Type: <b>${app_type}</b><br>
                          </p>
 
                          <P>Regards,</P>
@@ -204,7 +204,7 @@ app.post('*',(req,res)=>{
                          }
                          console.log(`Message sent: ${info.messageId}`);
                          console.log('Email Sent');
-                         
+
                          response=`END Appointment Booked Successfully
                          Thank you for using our service.`;
                     });
