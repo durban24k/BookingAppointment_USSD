@@ -1,6 +1,8 @@
 require('dotenv').config({path:'./.env'});
 const express=require('express');
 const logger=require('morgan');
+const nodemailer=require('nodemailer');
+const async=require('async');
 
 // Initiate The Express App
 const app=express();
@@ -116,16 +118,98 @@ app.post('*',(req,res)=>{
      }else if(count===7 && txt[6]=='1'){
           fname=txt[1];
           lname=txt[2];
+          if(txt[3]=='1'){
+               app_date=addDays(0);
+          }else if(txt[3]=='2'){
+               app_date=addDays(1);
+          }else if(txt[3]=='3'){
+               app_date=addDays(2);
+          }else if(txt[3]=='4'){
+               app_date=addDays(3);
+          }else if(txt[3]=='5'){
+               app_date=addDays(4);
+          }
+
+          if(txt[4]=='1'){
+               app_time='9:00 AM';
+          }else if(txt[4]=='2'){
+               app_time='10:00 AM';
+          }else if(txt[4]=='3'){
+               app_time='11:00 AM';
+          }else if(txt[4]=='4'){
+               app_time='12:00 NOON';
+          }else if(txt[4]=='5'){
+               app_time='2:00 PM';
+          }
+
+          if(txt[5]=='1'){
+               app_type='Eye Test';
+          }else if(txt[5]=='2'){
+               app_type='Frame Replacement';
+          }else if(txt[5]=='3'){
+               app_type='Doctor Consultation';
+          }
           let timestamp=new Date();
-          const db=require('./config/db_config.js');
-          const sql = "INSERT INTO patient SET ?";
-          db.query(sql,{fname,lname,phone_no,app_date,app_time,app_type,timestamp},(error,results,fields)=>{
-               if(error){
-                    res.status(400);
-                    response =`END TRY AGAIN
-                    Problem Encountered!!`;
+          
+          async.waterfall([
+               (done)=>{
+                    const db=require('./config/db_config.js');
+                    const sql = "INSERT INTO patient SET ?";
+                    db.query(sql,{fname,lname,phone_no,app_date,app_time,app_type,timestamp},(error,results,fields)=>{
+                         if(error){
+                              res.status(400);
+                              response =`END TRY AGAIN
+                              Problem Encountered!!`;
+                         }
+                         done(error);
+                    });
+               },
+               (done)=>{
+                    const emailContent = `
+                         <h3>New Appointment</h3>
+                         <p>A new appointment has been booked<br>
+                         ---DETAILS---<br>
+                         Name: ${fname} ${lname}<br>
+                         Phone No: ${phone_no}<br>
+                         Date: ${app_date}<br>
+                         Time: ${app_time}<br>
+                         Type: ${app_type}<br>
+                         </p>
+
+                         <P>Regards,</P>
+                         <p>The OPTICAL CARE Team.</p>
+                    `;
+                    // create reusable transporter object using the default SMTP transport
+                    const transporter = nodemailer.createTransport({
+                         host: 'mail.bevt.co.ke',
+                         port: 465,
+                         secure: true, // true for 465, false for other ports
+                         auth: {
+                              user: 'no-reply@bevt.co.ke', // generated ethereal user
+                              pass: process.env.MAILPW  // generated ethereal password
+                         },
+                         tls:{
+                              rejectUnauthorized:false
+                         }
+                    });
+                    const mailOptions = {
+                         from:'"OPTICAL CARE PLUS" <no-reply@bevt.co.ke>',
+                         to: 'yieldmarket@gmail.com',
+                         subject:'NO-REPLY || NEW APPOINTMENT',
+                         html: emailContent
+                    };
+                    transporter.sendMail(mailOptions,(e,info)=>{
+                         if(e){
+                              return console.log(e);
+                         }
+                         console.log(`Message sent: ${info.messageId}`);
+                         console.log('Email Sent');
+                         
+                         response=`END Appointment Booked Successfully
+                         Thank you for using our service.`;
+                    });
                }
-          });
+          ]);
           response=`END Appointment Booked Successfully!
                     Thank you for using our service.`;
      }else if(count===7 && txt[6]=='2'){
@@ -145,4 +229,4 @@ app.post('*',(req,res)=>{
 
 app.listen(port,()=>{
      console.log(`USSD APP running on port ${port}`);
-})
+});
